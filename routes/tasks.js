@@ -34,6 +34,50 @@ var loginCheck = function(req, res, next) {
 };
 
 //***********************************************************************
+//Sort tasks
+//***********************************************************************
+var taskSort = function(process, tasks) {
+	var newProcess = process;
+	var tasksObj = {};
+	  for (var i = 0; i < tasks.length; i++) {
+		  tasksObj[tasks[i]._id] = tasks[i];
+	  }
+	 for (var j = 0; j< process.length; j++) {
+		 var status = process[j];
+		 var resultSortedTasks = [];
+		 if (status.sortby == null || typeof(status.sortby) == "undefined") {
+			 continue;
+			 
+		// 担当者よりソート
+		 } else if (status.sortby == "assigner"){
+			 var sortedTasks = {};
+			 var task_assignment = "";
+			  for (var k = 0; k < status.tasks.length; k++) {
+				  var task_id = status.tasks[k];
+				  if (tasksObj[task_id].task_assignment == null || tasksObj[task_id].task_assignment == "") {
+					  task_assignment = "zzzzz";
+				  } else {
+					  task_assignment = tasksObj[task_id].task_assignment;
+				  }
+				  
+				  if (task_assignment in sortedTasks) {
+					  sortedTasks[task_assignment].push(task_id);
+				  } else {
+					  sortedTasks[task_assignment] = [task_id];
+				  }
+			  	}
+			  for (var key in sortedTasks) {
+				  resultSortedTasks = resultSortedTasks.concat(sortedTasks[key]);
+			  }
+			  
+			  newProcess[j].tasks = resultSortedTasks;
+		 }
+	};	
+
+	return newProcess;
+};
+
+//***********************************************************************
 // Show tasks
 //***********************************************************************
 router.get('/', loginCheck, function(req, res) {
@@ -57,6 +101,7 @@ router.get('/', loginCheck, function(req, res) {
 						console.log("success");
 						current_progress = data.work_flow;
 						kanban_info = {"column_number":process.length};
+						current_progress = taskSort(current_progress, result.docs);
 						req.session.task_settings = data.task_settings;
 						console.log(JSON.stringify(result.docs));
 						res.render('kanban', { "tasks": result.docs, "process":current_progress,
