@@ -393,7 +393,7 @@
 				"selectprocess",
 				{"current_process":$(this).attr('id')},
 				function(data,result) {
-					window.location.href = 'http://' + window.location.host  + '/tasks';
+					window.location.href = window.location.href + 'tasks';
 				}
 			);
 		})
@@ -442,7 +442,7 @@
 					"selectprocess",
 					{"current_process":$(this).attr('id'),"current_process_name":$(this).text()},
 					function(data,result) {
-						window.location.href = 'http://' + window.location.host  + '/tasks';
+						window.location.href = window.location.href + 'tasks';
 					}
 				);
 			});

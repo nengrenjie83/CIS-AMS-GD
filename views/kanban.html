@@ -109,6 +109,10 @@
 							WIP(<%=process[i].wip %>)
 						<% } %>
 					</div>
+					<!-- 
+					<div id = "status_<%=i%>_sortby">Sort By</div>
+					<div id = "status_<%=i%>_sortby_content" style="display: none;">Content</div>
+					-->
 				</th>
 			<% } %>
 			<tr>
@@ -310,30 +314,39 @@
 		
 		$(".processtitle").tooltip();
 		var language_setting = JSON.parse('<%-JSON.stringify(language_setting) %>');
+		
+		//***********************************************************************
+		//Delete Task
+		//***********************************************************************
 		function deleteTask(currentObj) {
-			var toDeleteTaskObj = {};
-			var currentStatusTasks = new Array();
-			var currentStatus;
-			toDeleteTaskObj.process_rev = $('#process').attr("rev");
-			toDeleteTaskObj.task_id = $(currentObj).parent().parent().parent().attr('id');
-			toDeleteTaskObj.task_rev = $(currentObj).parent().parent().parent().attr('rev');
-			currentStatus = $(currentObj).parent().parent().parent().parent();
-			toDeleteTaskObj.current_status_id = currentStatus.attr('id');
-			currentStatus.children().each(function(i,task) {
-				if (toDeleteTaskObj.task_id != task.id) {
-					currentStatusTasks.push(task.id);
-				}
-			});
-			toDeleteTaskObj.current_status_tasks = currentStatusTasks.toString();
-			//alert(JSON.stringify(toDeleteTaskObj));
-			$.post(
-				"/tasks/deletetask",
-				toDeleteTaskObj,
-				function(data,result) {
-					window.location.reload();
-				}
-			);
-			$(currentObj).parent().parent().parent().remove();
+			var msg = localStorage.getItem(language_setting + "_delete_confirmation"); 
+			if (confirm(msg)==true){
+				var toDeleteTaskObj = {};
+				var currentStatusTasks = new Array();
+				var currentStatus;
+				toDeleteTaskObj.process_rev = $('#process').attr("rev");
+				toDeleteTaskObj.task_id = $(currentObj).parent().parent().parent().attr('id');
+				toDeleteTaskObj.task_rev = $(currentObj).parent().parent().parent().attr('rev');
+				currentStatus = $(currentObj).parent().parent().parent().parent();
+				toDeleteTaskObj.current_status_id = currentStatus.attr('id');
+				currentStatus.children().each(function(i,task) {
+					if (toDeleteTaskObj.task_id != task.id) {
+						currentStatusTasks.push(task.id);
+					}
+				});
+				toDeleteTaskObj.current_status_tasks = currentStatusTasks.toString();
+				//alert(JSON.stringify(toDeleteTaskObj));
+				$.post(
+					"/tasks/deletetask",
+					toDeleteTaskObj,
+					function(data,result) {
+						window.location.reload();
+					}
+				);
+				$(currentObj).parent().parent().parent().remove(); 
+			}else{ 
+			  return false; 
+			}
 		}
 
 		function clearInputTemp(){
