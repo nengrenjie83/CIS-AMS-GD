@@ -523,7 +523,7 @@
 				$('#btn_edit').hide();
 
 				$('.theme-popover-mask').fadeIn(100);
-				$('.theme-popover').slideDown(200);
+				$('.theme-popover').slideDown(200);	
 			})
 			$('.theme-poptit .close').click(function(){
 				$('.theme-popover-mask').fadeOut(100);
@@ -534,6 +534,8 @@
 			$( 'th' ).tooltip();
 			var tasksjson ='<%-JSON.stringify(tasks) %>';
 			var tasks = JSON.parse(tasksjson);
+			var task_settingsjson = '<%-JSON.stringify(task_settings) %>';
+			var task_settings = JSON.parse(task_settingsjson);
 			var process = JSON.parse('<%-JSON.stringify(process) %>');
 			var tradeoff_options = new Array();
 			$.each(tasks, function(index, content){
@@ -571,9 +573,15 @@
 				var task_div_string = "";
 				task_div_string = task_div_string + "<div class='panel panel-primary' id = '" + content._id +"' rev = '" + content._rev +"'>"
 					+"	<div class='panel-title'> <h6 >"
-					+ "&nbsp;<a href = '#' class = 'taskdetail' title = '"
-					+ "Task Type:" + content.task_type1
-					+ "&#13;Task Detail:" + content.task_detail
+					+ "&nbsp;<a href = '#' class = 'taskdetail' title = '";
+					
+					 $.each(task_settings, function(key,task_setting){
+						 if (task_setting.item_type != "Unused" && key != "task_name"){
+							 task_div_string = task_div_string + "&#13;" + task_setting.item_name + ":" + content[key] + "&#13;";
+						 }
+					  });
+					
+					task_div_string = task_div_string
 					+"'>" + localStorage.getItem(language_setting + "_detail") + "</a>&nbsp;&nbsp;";
 
 				// 权限检查
@@ -589,10 +597,13 @@
 				task_div_string = task_div_string + "</h6> </div>"
 					+"	<div class='panel-body'><h5>"+content.task_name+"</h5></div>"
 					+"	<div class='panel-footer'>"
+					+"	<div class='panel-task-type'>"
+					+ content.task_type1 + "</div>"
 					+ emergency +assignment+ "</div>"
 					+"</div>"
 				$( '#' + content._id ).replaceWith(task_div_string);
-					$('.panel-footer').css({"height":'40',"font-size":'16px',"color":'blue',"text-align":'right',"background-color":"white"});
+					$('.panel-footer').css({"font-size":'16px',"color":'blue',"text-align":'right',"background-color":"white"});
+					$('.panel-task-type').css({"padding": "1px", "font-size":'14px',"color":'blue',"text-align":'left',"background-color":"white"});
 					$('.panel-primary').css("width",'200');
 					//$('.panel-primary').css("width",$(window).width()/process.length - 5);
 					$(".panel-title").css({"background-color":"lavender","height":'30',"align":"center","padding-top":'8px'});
@@ -602,7 +613,7 @@
 					}
 					$(".panel-primary").mouseover(function(){
 					$(".panel-primary").css("cursor","pointer");
-					$(".taskdetail").tooltip();
+					//$(".taskdetail").tooltip();
 					});
 
 			});
